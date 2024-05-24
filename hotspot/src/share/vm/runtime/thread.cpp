@@ -4128,6 +4128,8 @@ bool Threads::destroy_vm() {
     assert(SafepointSynchronize::is_at_safepoint(), "VM thread should exit at Safepoint");
     VMThread::destroy();
   }
+  
+  gclog_or_tty->print_cr("Majflt(exit jvm)=%ld", os::accumMajflt());
 
   // clean up ideal graph printers
 #if defined(COMPILER2) && !defined(PRODUCT)

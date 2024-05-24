@@ -78,7 +78,7 @@ endif
 ## Enables n-generational profiler
 SYSDEFS += -DNG2C_PROF
 ## Allows the target gen to be updated.
-#SYSDEFS += -DNG2C_PROF_ALLOC
+SYSDEFS += -DNG2C_PROF_ALLOC
 ## Allows the context to be expanded.
 SYSDEFS += -DNG2C_PROF_CONTEXT
 
