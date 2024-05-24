@@ -1,0 +1,6 @@
+editinfo
+tags
+cscope.*
+*.swp
+*.log
+*.class

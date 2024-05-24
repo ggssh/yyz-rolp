@@ -1,0 +1,94 @@
+#!/bin/bash
+
+#GC="CMS"
+GC="G1"
+
+# <Common opts>
+JVM_OPTS="$JVM_OPTS -server"
+JVM_OPTS="$JVM_OPTS -XX:-TieredCompilation"
+JVM_OPTS="$JVM_OPTS -XX:-UseBiasedLocking"
+#JVM_OPTS="$JVM_OPTS -XX:-UseCompressedOops"
+
+JVM_OPTS="$JVM_OPTS -XX:+PrintGCDetails"
+JVM_OPTS="$JVM_OPTS -XX:+PrintGCApplicationStoppedTime"
+JVM_OPTS="$JVM_OPTS -XX:+PrintGCDateStamps"
+JVM_OPTS="$JVM_OPTS -Xloggc:/tmp/jvm.log"
+
+JVM_OPTS="$JVM_OPTS -Xms12g"
+JVM_OPTS="$JVM_OPTS -Xmx12g"
+JVM_OPTS="$JVM_OPTS -XX:NewSize=512m"
+#JVM_OPTS="$JVM_OPTS -XX:NewSize=2g"
+JVM_OPTS="$JVM_OPTS -XX:MaxNewSize=512m"
+#JVM_OPTS="$JVM_OPTS -XX:MaxNewSize=2g"
+
+
+JVM_OPTS="$JVM_OPTS -XX:+UseTLAB"
+JVM_OPTS="$JVM_OPTS -XX:-ResizeTLAB"
+JVM_OPTS="$JVM_OPTS -XX:MinTLABSize=64k"
+
+#JVM_OPTS="$JVM_OPTS -XX:MaxTenuringThreshold=0"
+JVM_OPTS="$JVM_OPTS -XX:+PrintTenuringDistribution"
+JVM_OPTS="$JVM_OPTS -XX:InitialTenuringThreshold=15"
+JVM_OPTS="$JVM_OPTS -XX:SurvivorRatio=2"
+
+# <NG2C options>
+#JVM_OPTS="$JVM_OPTS -XX:NG2CStaticAnalysis=/home/rbruno/git/java-callgraph/results/lucene/app.ids"
+#JVM_OPTS="$JVM_OPTS -XX:NG2CStaticAnalysis=/home/rbruno/git/java-callgraph/results/graphchi/app.ids"
+#JVM_OPTS="$JVM_OPTS -XX:NG2CStaticAnalysis=/home/rbruno/git/java-callgraph/results/test2/app.ids"
+#JVM_OPTS="$JVM_OPTS -XX:NG2CStaticAnalysis=/home/rbruno/git/java-callgraph/results/ng3/app.ids"
+JVM_OPTS="$JVM_OPTS -XX:+UseROLP"
+
+if [ "$GC" == "CMS" ]
+then
+	# <CMS opts>
+	JVM_OPTS="$JVM_OPTS -XX:+UseParNewGC"
+	JVM_OPTS="$JVM_OPTS -XX:+UseConcMarkSweepGC"
+	JVM_OPTS="$JVM_OPTS -XX:+CMSParallelRemarkEnabled"
+	JVM_OPTS="$JVM_OPTS -XX:SurvivorRatio=8"
+	JVM_OPTS="$JVM_OPTS -XX:MaxTenuringThreshold=1"
+	JVM_OPTS="$JVM_OPTS -XX:CMSInitiatingOccupancyFraction=75"
+	JVM_OPTS="$JVM_OPTS -XX:+UseCMSInitiatingOccupancyOnly"
+	JVM_OPTS="$JVM_OPTS -XX:+PerfDisableSharedMem"
+	JVM_OPTS="$JVM_OPTS -XX:CMSWaitDuration=10000"
+	JVM_OPTS="$JVM_OPTS -XX:+CMSParallelInitialMarkEnabled"
+	JVM_OPTS="$JVM_OPTS -XX:+CMSEdenChunksRecordAlways"
+	JVM_OPTS="$JVM_OPTS -XX:CMSWaitDuration=10000"
+	JVM_OPTS="$JVM_OPTS -XX:+UseCondCardMark"
+elif [ "$GC" == "G1" ]
+then
+	# <G1 opts>
+	JVM_OPTS="$JVM_OPTS -XX:MaxGCPauseMillis=100"
+	JVM_OPTS="$JVM_OPTS -XX:+UseG1GC"
+	JVM_OPTS="$JVM_OPTS -XX:G1HeapRegionSize=32m"
+	JVM_OPTS="$JVM_OPTS -XX:G1RSetUpdatingPauseTimePercent=10"
+	JVM_OPTS="$JVM_OPTS -XX:InitiatingHeapOccupancyPercent=50"
+	JVM_OPTS="$JVM_OPTS -XX:G1HeapWastePercent=25"
+	JVM_OPTS="$JVM_OPTS -XX:ConcGCThreads=8"
+	JVM_OPTS="$JVM_OPTS -XX:ParallelGCThreads=8"
+else
+	echo "No suitable GC..."
+	exit 1
+fi
+
+# <Optional but useful>
+JVM_OPTS="$JVM_OPTS -XX:+UnlockDiagnosticVMOptions"
+JVM_OPTS="$JVM_OPTS -XX:CompileThreshold=10"
+#JVM_OPTS="$JVM_OPTS -XX:+PrintInlining"
+#JVM_OPTS="$JVM_OPTS -XX:+PrintCompilation"
+#JVM_OPTS="$JVM_OPTS -XX:+LogCompilation"
+#JVM_OPTS="$JVM_OPTS -XX:+PrintFlagsFinal"
+JVM_OPTS="$JVM_OPTS -XX:CompileCommand=dontinline,*.*"
+#JVM_OPTS="$JVM_OPTS -XX:CompileCommand=dontinline,NG3.allocate1"
+JVM_OPTS="$JVM_OPTS -XX:CompileCommand=print,NG3.allocate"
+JVM_OPTS="$JVM_OPTS -XX:CompileCommand=print,NG3.allocate1"
+JVM_OPTS="$JVM_OPTS -XX:CompileCommand=print,NG3.allocate2"
+#JVM_OPTS="$JVM_OPTS -XX:CompileCommand=print,NG3.iteration"
+
+# Other stuff
+#-XX:+G1SummarizeRSetStats
+#-XX:G1SummarizeRSetStatsPeriod=1
+#JVM_OPTS="$JVM_OPTS -XX:+SafepointALot -XX:GuaranteedSafepointInterval=100"
+#JVM_OPTS="$JVM_OPTS -XX:+PrintSafepointStatistics  -XX:PrintSafepointStatisticsCount=1"
+
+# YourKit Java Profiler
+#JVM_OPTS="$JVM_OPTS -agentpath:/home/rbruno/software/yjp-2016.02/bin/linux-x86-64/libyjpagent.so"
