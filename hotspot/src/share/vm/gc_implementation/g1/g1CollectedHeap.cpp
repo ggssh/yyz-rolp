@@ -1036,6 +1036,7 @@ HeapWord* G1CollectedHeap::attempt_allocation_slow(size_t word_size,
 
     if (should_try_gc) {
       bool succeeded;
+      // gclog_or_tty->print_cr("[yyz] G1CollectedHeap::attempt_allocation_slow -> do_collection_pause");
       result = do_collection_pause(word_size, gc_count_before, &succeeded,
           GCCause::_g1_inc_collection_pause);
       if (result != NULL) {
@@ -1162,6 +1163,7 @@ HeapWord* G1CollectedHeap::attempt_allocation_humongous(size_t word_size,
       // enough space for the allocation to succeed after the pause.
 
       bool succeeded;
+      // gclog_or_tty->print_cr("[yyz] G1CollectedHeap::attempt_allocation_humongous -> do_collection_pause");
       result = do_collection_pause(word_size, gc_count_before, &succeeded,
           GCCause::_g1_humongous_allocation);
       if (result != NULL) {
@@ -1633,9 +1635,13 @@ void G1CollectedHeap::do_full_collection(bool clear_all_soft_refs) {
   // do_full_collection() API to notify the caller than the collection
   // did not succeed (e.g., because it was locked out by the GC
   // locker). So, right now, we'll ignore the return value.
+  // [gc breakdown]
+  GCMajfltStats gc_majflt_stats;
+  gc_majflt_stats.start();
   bool dummy = do_collection(true,                /* explicit_gc */
                              clear_all_soft_refs,
                              0                    /* word_size */);
+  gc_majflt_stats.end_and_log("full");
 }
 
 // This code is mostly copied from TenuredGeneration.
@@ -1754,10 +1760,15 @@ G1CollectedHeap::satisfy_failed_allocation(size_t word_size,
     return result;
   }
 
+  // [gc breakdown]
+  GCMajfltStats gc_majflt_stats;
+  gc_majflt_stats.start();
   // Expansion didn't work, we'll try to do a Full GC.
   bool gc_succeeded = do_collection(false, /* explicit_gc */
                                     false, /* clear_all_soft_refs */
                                     word_size);
+  gc_majflt_stats.end_and_log("full");
+
   if (!gc_succeeded) {
     *succeeded = false;
     return NULL;
@@ -1771,10 +1782,14 @@ G1CollectedHeap::satisfy_failed_allocation(size_t word_size,
     return result;
   }
 
+  // [gc breakdown]
+  gc_majflt_stats.start();
   // Then, try a Full GC that will collect all soft references.
   gc_succeeded = do_collection(false, /* explicit_gc */
                                true,  /* clear_all_soft_refs */
                                word_size);
+  gc_majflt_stats.end_and_log("full");
+
   if (!gc_succeeded) {
     *succeeded = false;
     return NULL;
@@ -6757,6 +6772,7 @@ HeapRegion* G1CollectedHeap::new_gen_alloc_region(size_t word_size,
   // <underscore> using 'GCAllocForTenured' forces unlimited max regions
   if (count < g1_policy()->max_regions(GCAllocForTenured)) {
     HeapRegion* new_alloc_region = new_region(word_size, true /* do_expand */);
+    // gclog_or_tty->print_cr("[yyz] G1CollectedHeap::new_gen_alloc_region: new_alloc_region = %p", new_alloc_region);
     assert(new_alloc_region != NULL, "New gen alloc regions should always succeed.");
     // <underscore> TODO - if we fail to expand. We might want to try a GC?
     if (new_alloc_region != NULL) {
@@ -6824,6 +6840,8 @@ HeapRegion* GenAllocRegion::allocate_new_region(size_t word_size,
   gclog_or_tty->print_cr("<underscore> [GenAllocRegion::allocate_new_region] gen=%d, this=["INTPTR_FORMAT"], bottom=["INTPTR_FORMAT"]",
     this->gen(), this, region->bottom());
 #endif
+// gclog_or_tty->print_cr("<underscore> [GenAllocRegion::allocate_new_region] gen=%d, this=["INTPTR_FORMAT"], bottom=["INTPTR_FORMAT"]",
+//     this->gen(), this, region->bottom(), _g1h._gen_alloc_regions);
   return region;
 }
 

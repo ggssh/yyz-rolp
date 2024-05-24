@@ -1391,7 +1391,7 @@ static inline unsigned long proc_majflt(const char* fname) {
 }
 
 // Error will return 0
-unsigned long os::accumMajflt() {
+unsigned long os::get_accum_majflt() {
   return proc_majflt("/proc/self/stat");
 }
 

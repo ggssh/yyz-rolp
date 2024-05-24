@@ -67,4 +67,15 @@ class CMSGCStats : public GCStats {
   }
 };
 
+class GCMajfltStats {
+  size_t _stt_majflt;
+
+public:
+  GCMajfltStats();
+  ~GCMajfltStats();
+
+  void start();
+  void end_and_log(const char* cause);
+};
+
 #endif // SHARE_VM_GC_IMPLEMENTATION_SHARED_GCSTATS_HPP

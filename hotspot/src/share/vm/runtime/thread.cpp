@@ -4129,7 +4129,7 @@ bool Threads::destroy_vm() {
     VMThread::destroy();
   }
   
-  gclog_or_tty->print_cr("Majflt(exit jvm)=%ld", os::accumMajflt());
+  gclog_or_tty->print_cr("Majflt(exit jvm)=%ld", os::get_accum_majflt());
 
   // clean up ideal graph printers
 #if defined(COMPILER2) && !defined(PRODUCT)

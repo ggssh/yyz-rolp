@@ -189,7 +189,7 @@ class os: AllStatic {
   static double elapsedVTime();
 
   // [gc breakdown] Return the number of page major fault of the process.
-  static unsigned long accumMajflt();
+  static unsigned long get_accum_majflt();
 
   // Return current local time in a string (YYYY-MM-DD HH:MM:SS).
   // It is MT safe, but not async-safe, as reading time zone

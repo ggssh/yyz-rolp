@@ -151,9 +151,13 @@ void VM_G1IncCollectionPause::doit() {
       return;
     }
   }
-
+  
+  // [gc breakdown]
+  GCMajfltStats gc_majflt_stats;
+  gc_majflt_stats.start();
   _pause_succeeded =
     g1h->do_collection_pause_at_safepoint(_target_pause_time_ms);
+  gc_majflt_stats.end_and_log("young");
   if (_pause_succeeded && _word_size > 0) {
     // An allocation had been requested.
     _result = g1h->attempt_allocation_at_safepoint(_word_size,

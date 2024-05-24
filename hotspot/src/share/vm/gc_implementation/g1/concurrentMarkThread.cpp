@@ -156,7 +156,11 @@ void ConcurrentMarkThread::run() {
 
           CMCheckpointRootsFinalClosure final_cl(_cm);
           VM_CGC_Operation op(&final_cl, "GC remark", true /* needs_pll */);
+          // [gc breakdown]
+          GCMajfltStats gc_majflt_stats;
+          gc_majflt_stats.start();
           VMThread::execute(&op);
+          gc_majflt_stats.end_and_log("remark");
         }
         if (cm()->restart_for_overflow()) {
           if (G1TraceMarkStackOverflow) {
@@ -187,7 +191,11 @@ void ConcurrentMarkThread::run() {
 
         CMCleanUp cl_cl(_cm);
         VM_CGC_Operation op(&cl_cl, "GC cleanup", false /* needs_pll */);
+        // [gc breakdown]
+        GCMajfltStats gc_majflt_stats;
+        gc_majflt_stats.start();
         VMThread::execute(&op);
+        gc_majflt_stats.end_and_log("cleanup");
       } else {
         // We don't want to update the marking status if a GC pause
         // is already underway.

@@ -787,7 +787,7 @@ char* Universe::preferred_heap_base(size_t heap_size, size_t alignment, NARROW_O
 
 /* <underscore> where the heap gets created. */
 jint Universe::initialize_heap() {
-  gclog_or_tty->print_cr("Majflt(init heap)=%ld", os::accumMajflt());
+  gclog_or_tty->print_cr("Majflt(init heap)=%ld", os::get_accum_majflt());
 
   if (UseParallelGC) {
 #if INCLUDE_ALL_GCS
