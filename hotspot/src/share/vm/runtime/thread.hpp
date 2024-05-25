@@ -2080,5 +2080,33 @@ public:
   }
 };
 
+class NonJavaThread : public Thread {
+  private:
+    Thread* _thread;
+    NonJavaThread* _next;
+  public:
+    NonJavaThread(Thread* thread) : _thread(thread), _next(NULL) {}
+    void set_next(NonJavaThread* next) { _next = next; }
+    NonJavaThread* get_next() { return _next; }
+    Thread* get_thread() { return _thread; }
+    // virtual void run() = 0;
+};
+
+class NonJavaThreads : public ThreadClosure {
+  private:
+    NonJavaThread* _thread_list;
+  public:
+    NonJavaThreads() : _thread_list(NULL) {}
+    void do_thread(Thread* thread) {
+      if (!thread->is_Java_thread()) {
+        NonJavaThread *njt = new NonJavaThread(thread);
+        njt->set_next(_thread_list);
+        _thread_list = njt;
+      }
+    }
+
+    NonJavaThread* first() { return _thread_list; }
+};
+
 
 #endif // SHARE_VM_RUNTIME_THREAD_HPP

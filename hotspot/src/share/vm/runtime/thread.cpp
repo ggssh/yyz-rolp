@@ -1733,6 +1733,10 @@ void JavaThread::thread_main_inner() {
 
   DTRACE_THREAD_PROBE(stop, this);
 
+  long majflt, user_time, sys_time;
+  os::current_thread_majflt_and_cputime(&majflt, &user_time, &sys_time);
+  gclog_or_tty->print_cr("Exit JavaThread %s(tid=%d), Majflt=%ld, user=%ldms, sys=%ldms",
+    this->name(), Thread::current()->osthread()->thread_id(),majflt, user_time, sys_time);
   this->exit(false);
   delete this;
 }
@@ -4107,6 +4111,8 @@ bool Threads::destroy_vm() {
 
   thread->exit(true);
 
+  os::dump_thread_majflt_and_cputime();
+  gclog_or_tty->print_cr("Majflt(exit jvm)=%ld", os::get_accum_majflt());
   // Stop VM thread.
   {
     // 4945125 The vm thread comes to a safepoint during exit.
@@ -4128,8 +4134,6 @@ bool Threads::destroy_vm() {
     assert(SafepointSynchronize::is_at_safepoint(), "VM thread should exit at Safepoint");
     VMThread::destroy();
   }
-  
-  gclog_or_tty->print_cr("Majflt(exit jvm)=%ld", os::get_accum_majflt());
 
   // clean up ideal graph printers
 #if defined(COMPILER2) && !defined(PRODUCT)
