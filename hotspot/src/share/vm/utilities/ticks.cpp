@@ -66,3 +66,20 @@ double TicksToTimeHelper::seconds(const Tickspan& span) {
 jlong TicksToTimeHelper::milliseconds(const Tickspan& span) {
   return time_conversion<jlong>(span, MILLISECONDS);
 }
+
+uint64_t CPUTicks::stamp() {
+    _ticks = rdtscp();
+    return _ticks;
+}
+
+uint64_t CPUTicks::value() {
+    return _ticks;
+}
+
+inline uint64_t CPUTicks::rdtscp() {
+    uint32_t lo, hi;
+    __asm__ __volatile__ (
+        "rdtscp" : "=a"(lo), "=d"(hi)
+    );
+    return ((uint64_t)lo) | (((uint64_t)hi) << 32);
+}
