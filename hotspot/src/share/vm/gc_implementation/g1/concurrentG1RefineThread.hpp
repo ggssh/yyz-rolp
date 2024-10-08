@@ -88,6 +88,8 @@ public:
   void yield();
   // shutdown
   void stop();
+
+  char* name() const { return (char*)"ConcurrentG1RefineThread"; }
 };
 
 #endif // SHARE_VM_GC_IMPLEMENTATION_G1_CONCURRENTG1REFINETHREAD_HPP

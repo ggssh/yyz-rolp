@@ -1,7 +1,7 @@
 #ifndef SHARE_VM_NG2C_NG2C_GLOBALS_HPP
 #define SHARE_VM_NG2C_NG2C_GLOBALS_HPP
 
-# include "memory/allocation.inline.hpp"
+#include "memory/allocation.inline.hpp"
 
 typedef unsigned long ngen_t;
 
@@ -131,4 +131,23 @@ class PromotionCounter : public CHeapObj<mtGC>
   }
 };
 
+// <yyz>
+extern volatile jlong obj_malloc_count;
+extern volatile jlong obj_malloc_size;
+
+inline void update_obj_malloc_count() {
+  Atomic::add(1, &obj_malloc_count);
+}
+
+inline void update_obj_malloc_size(size_t sz) {
+  Atomic::add((jlong) sz, &obj_malloc_size);
+}
+
+inline long get_obj_malloc_count() {
+  return (long) obj_malloc_count;
+}
+
+inline long get_obj_malloc_size() {
+  return (long) obj_malloc_size;
+}
 #endif // SHARE_VM_NG2C_NG2C_GLOBALS_HPP

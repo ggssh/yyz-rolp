@@ -787,8 +787,6 @@ char* Universe::preferred_heap_base(size_t heap_size, size_t alignment, NARROW_O
 
 /* <underscore> where the heap gets created. */
 jint Universe::initialize_heap() {
-  gclog_or_tty->print_cr("Majflt(init heap)=%ld", os::get_accum_majflt());
-
   if (UseParallelGC) {
 #if INCLUDE_ALL_GCS
     Universe::_collectedHeap = new ParallelScavengeHeap();
@@ -829,6 +827,7 @@ jint Universe::initialize_heap() {
     Universe::_collectedHeap = new GenCollectedHeap(gc_policy);
   }
 
+  gclog_or_tty->print_cr("Majflt(init heap)=%ld", os::get_accum_majflt());
   jint status = Universe::heap()->initialize();
   if (status != JNI_OK) {
     return status;

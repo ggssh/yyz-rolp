@@ -1731,12 +1731,13 @@ void JavaThread::thread_main_inner() {
     this->entry_point()(this, this);
   }
 
-  DTRACE_THREAD_PROBE(stop, this);
-
   long majflt, user_time, sys_time;
   os::current_thread_majflt_and_cputime(&majflt, &user_time, &sys_time);
   gclog_or_tty->print_cr("Exit JavaThread %s(tid=%d), Majflt=%ld, user=%ldms, sys=%ldms",
-    this->name(), Thread::current()->osthread()->thread_id(),majflt, user_time, sys_time);
+    this->name(), Thread::current()->osthread()->thread_id(), majflt, user_time, sys_time);
+
+  DTRACE_THREAD_PROBE(stop, this);
+
   this->exit(false);
   delete this;
 }
@@ -4111,8 +4112,6 @@ bool Threads::destroy_vm() {
 
   thread->exit(true);
 
-  os::dump_thread_majflt_and_cputime();
-  gclog_or_tty->print_cr("Majflt(exit jvm)=%ld", os::get_accum_majflt());
   // Stop VM thread.
   {
     // 4945125 The vm thread comes to a safepoint during exit.
@@ -4795,8 +4794,13 @@ void Thread::set_alloc_gen(int gen) {
   // TODO - assert gen is a valid gen number (< gen array size)
   assert(gen >= 0, "invalid gen number");
   assert(gen_tlabs()[gen]->myThread() == this, "invariant");
-  _alloc_gen = gen;
-  _genTlab = _tlabGenArray[gen];
+#if defined(DISABLE_FOR_PROF)
+    _alloc_gen = 0;
+    _genTlab = _tlabGenArray[0];
+#else
+    _alloc_gen = gen;
+    _genTlab = _tlabGenArray[gen];
+#endif
 #if DEBUG_OBJ_ALLOC
     gclog_or_tty->print_cr("<underscore> setAllocGen (gen=%d) -> %s is now being used ", gen, gen ? "tlabOld" : "tlabEden");
 #endif

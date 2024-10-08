@@ -2,6 +2,9 @@
 
 # include "memory/universe.inline.hpp"
 
+volatile jlong obj_malloc_count = 0;
+volatile jlong obj_malloc_size = 0;
+
 void
 NGenerationArray::prepare_contexts()
 {

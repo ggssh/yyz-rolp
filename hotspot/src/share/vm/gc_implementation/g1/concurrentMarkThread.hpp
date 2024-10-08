@@ -92,6 +92,8 @@ class ConcurrentMarkThread: public ConcurrentGCThread {
   // Yield for GC
   void            yield();
 
+  char* name() const { return (char*)"ConcurrentMarkThread"; }
+
   // shutdown
   void stop();
 };

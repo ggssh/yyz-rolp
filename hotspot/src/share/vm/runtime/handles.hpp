@@ -205,7 +205,13 @@ class KlassHandle : public StackObj {
     bool not_null() const { return _value != NULL; }
 
    int  alloc_gen() { return _alloc_gen; }
-   void set_alloc_gen(int alloc_gen) { _alloc_gen = alloc_gen; }
+   void set_alloc_gen(int alloc_gen) {
+#if defined(DISABLE_FOR_PROF)
+      _alloc_gen = 0;
+#else
+      _alloc_gen = alloc_gen;
+#endif
+   }
    unsigned int  as_hash() { return _as_hash; }
    void set_as_hash(unsigned int as_hash) { _as_hash = as_hash; }
 };

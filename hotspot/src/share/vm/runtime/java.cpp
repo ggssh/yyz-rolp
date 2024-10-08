@@ -474,6 +474,7 @@ void before_exit(JavaThread * thread) {
     }
   }
 
+  os::dump_thread_majflt_and_cputime();
   // The only difference between this and Win32's _onexit procs is that
   // this version is invoked before any threads get killed.
   ExitProc* current = exit_procs;
@@ -507,7 +508,9 @@ void before_exit(JavaThread * thread) {
   // JVM will be taken down at a safepoint when such threads are inactive --
   // except for some concurrent G1 threads, see (comment in)
   // Threads::destroy_vm().
-
+  gclog_or_tty->print_cr("Majflt(exit jvm)=%ld", os::get_accum_majflt());
+  gclog_or_tty->print_cr("Obj alloc time: %ld", get_obj_malloc_count());
+  gclog_or_tty->print_cr("Total alloc size: %ld Bytes", get_obj_malloc_size()); 
   // Print GC/heap related information.
   if (PrintGCDetails) {
     Universe::print();

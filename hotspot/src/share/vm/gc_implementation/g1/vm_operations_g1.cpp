@@ -157,6 +157,8 @@ void VM_G1IncCollectionPause::doit() {
   gc_majflt_stats.start();
   _pause_succeeded =
     g1h->do_collection_pause_at_safepoint(_target_pause_time_ms);
+  size_t bcdg = g1h->g1_policy()->bytes_copied_during_gc();
+  gclog_or_tty->print_cr("[DEBUG-Young] bytes_copied_during_gc: %lu", bcdg);
   gc_majflt_stats.end_and_log("young");
   if (_pause_succeeded && _word_size > 0) {
     // An allocation had been requested.

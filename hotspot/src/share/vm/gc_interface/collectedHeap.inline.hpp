@@ -128,11 +128,16 @@ HeapWord* CollectedHeap::common_mem_allocate_noinit(KlassHandle klass, size_t si
   // Clear unhandled oops for memory allocation.  Memory allocation might
   // not take out a lock if from tlab, so clear here.
   CHECK_UNHANDLED_OOPS_ONLY(THREAD->clear_unhandled_oops();)
-
+  // <yyz>
+  // update_obj_malloc_count();
+  // update_obj_malloc_size(size * HeapWordSize);
   if (HAS_PENDING_EXCEPTION) {
     NOT_PRODUCT(guarantee(false, "Should not allocate with exception pending"));
     return NULL;  // caller does a CHECK_0 too
   }
+  // if (klass.alloc_gen()) {
+  //   gclog_or_tty->print_cr("<yyz> obj alloc, gen = %d, size = %zu", THREAD->alloc_gen(), size);
+  // }
 
   HeapWord* result = NULL;
   // <underscore> UseTLAB is a runtime flag. It should always be on.
