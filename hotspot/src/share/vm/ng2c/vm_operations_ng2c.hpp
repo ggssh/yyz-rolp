@@ -116,9 +116,11 @@ class NG2C_MergeAllocCounters : public VM_Operation
         }
       }
 
+#if !defined(DISABLE_FOR_PROF)
       if (!should_profile()) {
         MaxTenuringThreshold = 1;
       }
+#endif
     }
 
   virtual bool doit_prologue();

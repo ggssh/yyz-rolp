@@ -129,8 +129,8 @@ HeapWord* CollectedHeap::common_mem_allocate_noinit(KlassHandle klass, size_t si
   // not take out a lock if from tlab, so clear here.
   CHECK_UNHANDLED_OOPS_ONLY(THREAD->clear_unhandled_oops();)
   // <yyz>
-  // update_obj_malloc_count();
-  // update_obj_malloc_size(size * HeapWordSize);
+  update_obj_malloc_count();
+  update_obj_malloc_size(size * HeapWordSize);
   if (HAS_PENDING_EXCEPTION) {
     NOT_PRODUCT(guarantee(false, "Should not allocate with exception pending"));
     return NULL;  // caller does a CHECK_0 too
